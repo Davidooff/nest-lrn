@@ -6,6 +6,11 @@
 
 nest g module/service/controller/resource
 
+## Commands wich I will forget
+
+export class UpdateNinjaDto extends PartialType(CreateNinjaDto) {}
+https://docs.nestjs.com/openapi/mapped-types
+
 ## Installation
 
 ```bash
