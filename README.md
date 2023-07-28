@@ -11,6 +11,8 @@ nest g module/service/controller/resource
 export class UpdateNinjaDto extends PartialType(CreateNinjaDto) {}
 https://docs.nestjs.com/openapi/mapped-types
 
+bad request exception
+
 ## Installation
 
 ```bash
