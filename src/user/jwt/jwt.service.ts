@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { sign, verify } from 'jsonwebtoken';
 
+export interface Tokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export interface AccessTokenData {
-  role: number;
   _id: string;
+  role: number;
 }
 
 export interface RefreshTokenData {
   _id: string;
+  role: number;
 }
 
 interface GenerateTokensArgs extends RefreshTokenData, AccessTokenData {}
@@ -15,26 +21,27 @@ interface GenerateTokensArgs extends RefreshTokenData, AccessTokenData {}
 @Injectable()
 export class JwtService {
   checkAccessToken(token: string): AccessTokenData {
-    return verify(token, process.env.JWT_SECRET) as AccessTokenData;
+    try {
+      let verifyedToken = verify(token, process.env.JWT_SECRET);
+      return verifyedToken as AccessTokenData;
+    } catch (e) {
+      return { _id: '-1', role: -1 };
+    }
   }
 
   checkRefreshToken(token: string): RefreshTokenData {
     return verify(token, process.env.JWT_SECRET) as RefreshTokenData;
   }
 
-  generateTokens(generateTokensArgs: GenerateTokensArgs): {
-    accessToke: string;
-    refreshToken: string;
-  } {
-    console.log('generateTokens');
+  generateTokens(generateTokensArgs: GenerateTokensArgs): Tokens {
     return {
-      accessToke: sign(
+      accessToken: sign(
         { _id: generateTokensArgs._id, role: generateTokensArgs.role },
         process.env.JWT_SECRET,
         { expiresIn: process.env.ACCESS_TOKEN_REFRESH_TIME },
       ),
       refreshToken: sign(
-        { _id: generateTokensArgs._id },
+        { _id: generateTokensArgs._id, role: generateTokensArgs.role },
         process.env.JWT_SECRET,
         { expiresIn: process.env.REFRESH_TOKEN_REFRESH_TIME },
       ),

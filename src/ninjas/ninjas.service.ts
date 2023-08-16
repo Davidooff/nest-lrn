@@ -65,6 +65,6 @@ export class NinjasService {
 
   generateId(): number {
     // generate random id
-    return randomInt(100000);
+    return Date.now();
   }
 }

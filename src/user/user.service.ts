@@ -4,11 +4,7 @@ import * as mongoose from 'mongoose';
 import { User } from './schemas/user.schema';
 import { UserAuthData } from './dto/user.auth-data.dto';
 import { hashSync, compareSync } from 'bcrypt';
-import {
-  JwtService,
-  AccessTokenData,
-  RefreshTokenData,
-} from './jwt/jwt.service';
+import { JwtService, Tokens } from './jwt/jwt.service';
 
 @Injectable()
 export class UserService {
@@ -26,9 +22,7 @@ export class UserService {
     delete newUser.password;
     return newUser;
   }
-  async loginUser(
-    user: UserAuthData,
-  ): Promise<{ accessToke: string; refreshToken: string }> {
+  async loginUser(user: UserAuthData): Promise<Tokens> {
     const userDB = await this.UserModel.findOne({ login: user.login }).lean();
     if (!userDB) throw new Error();
     if (!compareSync(user.password, userDB.password)) throw new Error();
@@ -36,5 +30,20 @@ export class UserService {
       _id: userDB._id.toString(),
       role: userDB.role,
     });
+  }
+
+  async refreshTokens(refreshToken: string): Promise<Tokens> {
+    let { _id } = this.JWT.checkRefreshToken(refreshToken);
+    const user = await this.UserModel.findOne({ _id }).lean();
+    if (!user) throw new Error();
+    return this.JWT.generateTokens({
+      _id: user._id.toString(),
+      role: user.role,
+    });
+  }
+
+  async updateRole(_id: string, role: number): Promise<void> {
+    let data = await this.UserModel.updateOne({ _id }, { role });
+    console.log(data);
   }
 }

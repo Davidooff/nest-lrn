@@ -1,4 +1,6 @@
 import {
+  IsInt,
+  IsNotEmpty,
   IsString,
   Length,
   Matches,
@@ -18,4 +20,19 @@ export class UserAuthData {
     message: 'password too weak',
   })
   password: string;
+}
+
+export class RefreshData {
+  @IsString()
+  @IsNotEmpty()
+  refreshToken: string;
+}
+
+export class UpdateRole {
+  @IsNotEmpty()
+  @IsString()
+  _id: string;
+  @IsNotEmpty()
+  @IsInt()
+  role: number;
 }

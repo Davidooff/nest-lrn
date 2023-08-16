@@ -1,7 +1,10 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Put } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './schemas/user.schema';
-import { UserAuthData } from './dto/user.auth-data.dto';
+import {
+  RefreshData,
+  UpdateRole,
+  UserAuthData,
+} from './dto/user.auth-data.dto';
 import { UserGuard } from './user.guard';
 
 @Controller('user')
@@ -18,5 +21,16 @@ export class UserController {
   @Post('/login')
   login(@Body() userAuthData: UserAuthData) {
     return this.userService.loginUser(userAuthData);
+  }
+  @Post('/refresh')
+  refresh(@Body() data: RefreshData) {
+    return this.userService.refreshTokens(data.refreshToken);
+  }
+
+  @Put('/role')
+  changeRole(@Body() updateRole: UpdateRole) {
+    const { _id, role } = updateRole;
+    this.userService.updateRole(_id, role);
+    return;
   }
 }
